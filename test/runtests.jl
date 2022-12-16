@@ -1,15 +1,14 @@
-using DrWatson, Test
-@quickactivate "ScienceProjectTemplate"
+using Test
+using ScienceProjectTemplate
 
-# Here you include files using `srcdir`
-# include(srcdir("file.jl"))
+# using TestEnv; TestEnv.activate()
 
-# Run test suite
 println("Starting tests")
 ti = time()
 
-@testset "ScienceProjectTemplate tests" begin
-    @test 1 == 1
+@testset "Utils" begin
+    include("utils/misc.jl")
+    include("utils/stats.jl")
 end
 
 ti = time() - ti
