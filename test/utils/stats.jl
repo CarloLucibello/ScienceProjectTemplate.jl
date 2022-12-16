@@ -18,7 +18,6 @@
     @test OnlineStats.nobs(s1) == 2 * OnlineStats.nobs(s)
 
     @testset "reduce" begin
-        
         data = [(a = i, b = 2*i) for i in 1:10];
         s = reduce(Stats(), data)
 

@@ -14,8 +14,11 @@ julia> OnlineStats.fit!(s, (a = 1, b = 2));  # add one datapoint at a time
 
 julia> OnlineStats.fit!(s, Dict(:a => 2, :b => 3, :c=>4)); # also support dicts and new observables
 
-julia> OnlineStats.nobs(s)
-2
+julia> s
+Stats:
+  a  =  1.5 ± 0.25      (2 obs)
+  b  =  2.5 ± 0.25      (2 obs)
+  c  =  4.0 ± 1.0       (1 obs)
 
 julia> data = [(a = i, b = 2*i) for i in 1:10];
 
@@ -31,8 +34,8 @@ julia> s.a      # mean and error (as a Measurements.jl type)
 
 julia> reduce(Stats(), data)
 Stats:
-  a = 5.5 ± 0.92        (10 obs)
-  b = 11.0 ± 3.7        (10 obs)
+  a  =  5.5 ± 0.92        (10 obs)
+  b  =  11.0 ± 3.7        (10 obs)
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
     _stats::OrderedDict{Symbol, OnlineStat}
@@ -100,11 +103,15 @@ function mean_with_err(s::Stats)
 end
 
 function Base.show(io::IO, s::Stats)
-    println(io, "Stats:")
+    if OnlineStats.nobs(s) == 0
+        print(io, "Stats: no observations.")
+    else
+        print(io, "Stats:")
+    end
     for k in keys(s)
         m = getproperty(s, k)
         n = OnlineStats.nobs(s[k])  
-        println(io, "  $(k) = $(m)\t($(n) obs)")
+        print(io, "\n  $(k)  =  $(m)\t($(n) obs)")
     end
 end
 
