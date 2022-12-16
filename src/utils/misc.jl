@@ -14,9 +14,9 @@ function check_filename(filename)
     return filename
 end
 
+# PIRACY! TODO: make PR to DrWatson.jl
 function DrWatson.dict_list(od::OrderedDict)
     d = Dict(od)
     dlist = dict_list(d)
     return [OrderedDict((k => d[k] for k in keys(od))...) for d in dlist]
 end
-

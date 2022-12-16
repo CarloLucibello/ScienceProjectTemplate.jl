@@ -1,11 +1,13 @@
 module ScienceProjectTemplate
 
-using OnlineStats: OnlineStats
+using Random, Statistics, LinearAlgebra
+using OnlineStats: OnlineStats, OnlineStat
 using DrWatson: DrWatson, dict_list
 using OrderedCollections: OrderedDict
+using Measurements
 
 include("utils/stats.jl")
-export Stats
+export Stats, mean_with_err
 
 include("utils/misc.jl")
 export check_filename, dict_list

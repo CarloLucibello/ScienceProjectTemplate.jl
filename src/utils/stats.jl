@@ -1,4 +1,39 @@
+"""
+    Stats() <: OnlineStats.OnlineStat
 
+A type for collecting statistics. 
+
+# Examples
+
+```julia
+julia> using OnlineStats
+
+julia> s = Stats();
+
+julia> OnlineStats.fit!(s, (a = 1, b = 2));  # add one datapoint at a time
+
+julia> OnlineStats.fit!(s, Dict(:a => 2, :b => 3, :c=>4)); # also support dicts and new observables
+
+julia> OnlineStats.nobs(s)
+2
+
+julia> data = [(a = i, b = 2*i) for i in 1:10];
+
+julia> OnlineStats.fit!(s, data);  # add multiple datapoints
+
+julia> OnlineStats.nobs(s)
+12
+
+julia> s.a      # mean and error (as a Measurements.jl type)
+1.5 ± 0.25
+
+# reduce interface
+
+julia> reduce(Stats(), data)
+Stats:
+  a = 5.5 ± 0.92        (10 obs)
+  b = 11.0 ± 3.7        (10 obs)
+"""
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
     _stats::OrderedDict{Symbol, OnlineStat}
 end
@@ -21,7 +56,8 @@ function Base.getproperty(s::Stats, k::Symbol)
     if hasfield(Stats, k)
         return getfield(s, k)
     else
-        return getindex(s, k)
+        x = getfield(s, :_stats)[k].stats
+        return OnlineStats.value(x[1]) ± (OnlineStats.value(x[2]) / OnlineStats.nobs(x[2]))
     end
 end
 
@@ -34,7 +70,7 @@ function OnlineStats._fit!(s::Stats, x::Union{NamedTuple, AbstractDict{Symbol}})
     end
 end
 
-_init_stat() = Series(Mean(), Variance())
+_init_stat() = OnlineStats.Series(OnlineStats.Mean(), OnlineStats.Variance())
 
 Base.empty!(s::Stats) = s._stats = OrderedDict{Symbol, Any}()
 
@@ -63,10 +99,18 @@ function mean_with_err(s::Stats)
     return d
 end
 
-Base.show(io::IO, s::Stats) = show(io, s._stats)
+function Base.show(io::IO, s::Stats)
+    println(io, "Stats:")
+    for k in keys(s)
+        m = getproperty(s, k)
+        n = OnlineStats.nobs(s[k])  
+        println(io, "  $(k) = $(m)\t($(n) obs)")
+    end
+end
 
 # Binary op interface for reduce/mapreduce
 function (s::Stats)(x, y)
+    @assert OnlineStats.nobs(s) == 0
     OnlineStats.fit!(s, x)
     OnlineStats.fit!(s, y)
     return s

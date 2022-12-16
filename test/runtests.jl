@@ -1,7 +1,10 @@
+# using TestEnv; TestEnv.activate()
 using Test
 using ScienceProjectTemplate
+using Random, Statistics, LinearAlgebra
+import OnlineStats
+using OrderedCollections: OrderedDict
 
-# using TestEnv; TestEnv.activate()
 
 println("Starting tests")
 ti = time()
