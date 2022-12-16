@@ -18,9 +18,13 @@
     @test OnlineStats.nobs(s1) == 2 * OnlineStats.nobs(s)
 
     @testset "reduce" begin
-        data = [(x = rand(), y = rand()) for _ in 1:10]
-        s = reduce(MyStats(), data)
-        @test Stats.nobs(s) == 10
         
+        data = [(a = i, b = 2*i) for i in 1:10];
+        s = reduce(Stats(), data)
+
+        @test OnlineStats.nobs(s) == 10
+        @test s.a ≈ 5.5
+        @test s.a.err ≈ 0.916666666
     end
+
 end
