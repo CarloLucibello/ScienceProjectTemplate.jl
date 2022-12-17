@@ -20,3 +20,11 @@ function DrWatson.dict_list(od::OrderedDict)
     dlist = dict_list(d)
     return [OrderedDict((k => d[k] for k in keys(od))...) for d in dlist]
 end
+
+function Base.merge(s::OrderedDict, nt::NamedTuple)
+    snew = deepcopy(s)
+    for (k, v) in pairs(nt)
+        snew[k] = v 
+    end
+    return snew
+end

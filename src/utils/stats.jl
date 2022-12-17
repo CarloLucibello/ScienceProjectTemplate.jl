@@ -60,7 +60,7 @@ function Base.getproperty(s::Stats, k::Symbol)
         return getfield(s, k)
     else
         x = getfield(s, :_stats)[k].stats
-        return OnlineStats.value(x[1]) ± (OnlineStats.value(x[2]) / OnlineStats.nobs(x[2]))
+        return OnlineStats.value(x[1]) ± sqrt(OnlineStats.value(x[2]) / OnlineStats.nobs(x[2]))
     end
 end
 
@@ -90,17 +90,20 @@ OnlineStats.nobs(s::Stats) = length(s._stats) > 0 ? OnlineStats.nobs(first(value
 
 OnlineStats.value(s::Stats) = Statistics.mean(s)
 
-Statistics.mean(s::Stats) = OrderedDict(k => OnlineStats.value(v.stats[1]) for (k,v) in pairs(s))
-Statistics.var(s::Stats) = OrderedDict(k => OnlineStats.value(v.stats[2]) for (k,v) in pairs(s))
+Statistics.mean(s::Stats) = (; (k => OnlineStats.value(v.stats[1]) for (k,v) in pairs(s))...)
+Statistics.var(s::Stats) = (; (k => OnlineStats.value(v.stats[2]) for (k,v) in pairs(s))...)
 
 function mean_with_err(s::Stats)
     d = OrderedDict{Symbol,Any}()
-    for (k, v) in pairs(s)
-        d[k] = OnlineStats.value(v.stats[1])
-        d[Symbol(k, "_err")] = sqrt(OnlineStats.value(v.stats[2]) / v.stats[2].n)
+    m = measurement(s)
+    for (k, v) in pairs(m)
+        d[k] = v.val
+        d[Symbol(k, "_err")] = v.err
     end
-    return d
+    return (; d...)
 end
+
+Measurements.measurement(s::Stats) = (; (k => getproperty(s, k) for k in keys(s))...)
 
 function Base.show(io::IO, s::Stats)
     if OnlineStats.nobs(s) == 0
