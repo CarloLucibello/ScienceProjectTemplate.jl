@@ -69,9 +69,9 @@ julia> subseteq(df, a=1, b=4)
 subseteq(df; kws...) = DataFrames.subset(df, (k => x -> x .== v for (k, v) in kws)...)
 
 """
-    combine_results(df; by, cols, errs, col_n)
+    combine_results(df; by, cols, errs, col_n = :nsamples)
 
-Combine the results of a measurement in `df` by averaging the values in `cols`
+Combine the results of measurements in `df` by averaging the values in `cols`
 grouped by the columns in `by` and 
 propagating the errors in `errs` using the number of samples in `col_n`.
 
@@ -80,28 +80,28 @@ propagating the errors in `errs` using the number of samples in `col_n`.
 ```julia
 julia> using DataFrames
 
-julia> df = DataFrame(a = [1,1,3], b=[2,2,4], n = [2,3,4], c = [2.,2.,4.], c_delta = [0.2,0.1,0.2])
+julia> df = DataFrame(a = [1,1,3], b=[2,2,4], n = [2,3,4], c = [2.,2.1,4.], c_err = [0.2,0.1,0.2])
 3×5 DataFrame
- Row │ a      b      n      c        c_delta 
+ Row │ a      b      n      c        c_err   
      │ Int64  Int64  Int64  Float64  Float64 
 ─────┼───────────────────────────────────────
    1 │     1      2      2      2.0      0.2
-   2 │     1      2      3      2.0      0.1
+   2 │     1      2      3      2.1      0.1
    3 │     3      4      4      4.0      0.2
 
 julia> combine_results(df, by=1:2, cols=4:2:ncol(df), errs=5:2:ncol(df), col_n=:n)
 2×5 DataFrame
- Row │ a      b      n      c        c_delta  
+ Row │ a      b      n      c        c_err    
      │ Int64  Int64  Int64  Float64  Float64  
 ─────┼────────────────────────────────────────
-   1 │     1      2      5      2.0  0.083666
-   2 │     3      4      4      4.0  0.2
+   1 │     1      2      5     2.06  0.087178
+   2 │     3      4      4     4.0   0.2
 ```
 """
 function combine_results(df::DataFrame; 
         by, 
         cols, 
-        errs = cols .+ 1, 
+        errs, 
         col_n::Symbol = :nsamples)
 
     par_cols = Symbol.(names(df)[by])
