@@ -60,7 +60,10 @@ function Base.getproperty(s::Stats, k::Symbol)
         return getfield(s, k)
     else
         x = getfield(s, :_stats)[k].stats
-        return OnlineStats.value(x[1]) ± sqrt(OnlineStats.value(x[2]) / OnlineStats.nobs(x[2]))
+        n = OnlineStats.nobs(x[1])
+        μ = OnlineStats.value(x[1])
+        σ = n == 1 ? Inf : sqrt(OnlineStats.value(x[2]) / n)
+        return μ ± σ
     end
 end
 
@@ -107,7 +110,7 @@ Measurements.measurement(s::Stats) = (; (k => getproperty(s, k) for k in keys(s)
 
 function Base.show(io::IO, s::Stats)
     if OnlineStats.nobs(s) == 0
-        print(io, "Stats: no observations.")
+        print(io, "Stats object with 0 observations")
     else
         print(io, "Stats:")
     end

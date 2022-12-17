@@ -22,13 +22,19 @@
         @test s.a.err ≈ √(2 / 6)
     end
 
+    @testset "one observation" begin
+        s = OnlineStats.fit!(Stats(), [(a=1,),])
+        @test s.a.val == 1 
+        @test s.a.err == Inf
+    end
+
     @testset "reduce" begin
         data = [(a = i, b = 2*i) for i in 1:10];
         s = reduce(Stats(), data)
 
         @test OnlineStats.nobs(s) == 10
         @test s.a ≈ 5.5
-        @test s.a.err ≈ 0.9574271077563381
+        @test s.a.err ≈ 0.957427107756338
     end
 
     @testset "measurement" begin
@@ -38,8 +44,9 @@
         m = measurement(s)
         @test m isa NamedTuple
         @test m.a isa Measurements.Measurement
-        @test m.a == 5.5 ± 0.9574271077563381
-        @test m.b == 11.0 ± 1.9148542155126762
+        @test m.a.val ≈ 5.5
+        @test m.a.err ≈ 0.957427107756338
+        @test m.b.val ≈ 11.0
+        @test m.b.err ≈ 1.9148542155126762
     end
-
 end
