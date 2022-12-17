@@ -37,6 +37,38 @@ function cartesian_list(; kws...)
     return [(; (k => d[k] for (k,_) in kws)...) for d in dlist]
 end
 
+"""
+    subseteq(df; col1=val1, col2=val2, ...)
+
+Return a subset of `df` where the values of the columns `col1`, `col2`, ..., 
+are equal to `val1`, `val2`, ... .
+
+# Examples
+
+```julia
+
+julia> df = DataFrame(a=[1,2,3,1], b=[4,5,6,4], c=[7,8,9,10])
+4×3 DataFrame
+ Row │ a      b      c     
+     │ Int64  Int64  Int64 
+─────┼─────────────────────
+   1 │     1      4      7
+   2 │     2      5      8
+   3 │     3      6      9
+   4 │     1      4     10
+
+julia> subseteq(df, a=1, b=4)
+2×3 DataFrame
+ Row │ a      b      c     
+     │ Int64  Int64  Int64 
+─────┼─────────────────────
+   1 │     1      4      7
+   2 │     1      4     10
+```
+"""
+subseteq(df; kws...) = DataFrames.subset(df, (k => x -> x .== v for (k, v) in kws)...)
+
+
 # PIRACY!
 function Base.merge(s::OrderedDict, nt::NamedTuple)
     snew = deepcopy(s)

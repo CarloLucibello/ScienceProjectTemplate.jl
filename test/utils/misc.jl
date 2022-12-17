@@ -6,3 +6,9 @@
         @test collect(keys(l)) == [:z, :a, :f]
     end
 end
+
+@testset "subseteq" begin
+    df = DataFrame(a=[1,2,3,1], b=[4,5,6,4], c=[7,8,9,10])
+    df2 = subseteq(df, a=1, b=4)
+    @test df2 == DataFrame(a=[1,1], b=[4,4], c=[7,10])
+end
