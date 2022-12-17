@@ -12,3 +12,19 @@ end
     df2 = subseteq(df, a=1, b=4)
     @test df2 == DataFrame(a=[1,1], b=[4,4], c=[7,10])
 end
+
+@testset "combine_results" begin
+    df = DataFrame(a = [1,1,3], 
+                   b = [2,2,4], 
+                   n = [2,3,4], 
+                   c = [2.,2.,4.], 
+                   c_delta = [0.2,0.1,0.2])
+
+    df2 = combine_results(df, by=1:2, cols=4:2:ncol(df), errs=5:2:ncol(df), col_n=:n)
+
+    @test df2 ≈ DataFrame(a = [1,3], 
+                    b = [2,4], 
+                    n = [5,4], 
+                    c = [2.,4.], 
+                    c_delta = [0.083666,0.2])
+end

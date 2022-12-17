@@ -8,43 +8,10 @@ respath = datadir("raw", "gradient_descent")
 files = [joinpath(respath, file) for file in readdir(respath) 
          if !(contains(file, "nsamples=1.") || contains(file, "nsamples=1_"))]
 
-dfs = [CSV.read(file) for file in files]
+dfs = [CSV.read(file, DataFrame) for file in files]
 df = reduce(vcat, dfs)
 
-function combine_results(df; par_idxs, res_idxs, err_idxs = res_idxs .+ 1)
-    par_cols = Symbol.(names(df)[par_idxs])
-    res_cols = Symbol.(names(df)[res_idxs])
-    err_cols = Symbol.(names(df)[err_idxs])
-       
-    gd = groupby(df, par_cols)
-
-    function reduce_measurements(df)
-        nsamples = sum(df.nsamples)
-        dmeans = Dict(col => sum(df[!,col] .* df.nsamples) / nsamples for col in res_cols)
-        
-        function meansq(col, err_col)
-            sumresidues = df[!,err_col].^2 .* df.nsamples .* (df.nsamples .- 1)
-            return sum(sumresidues .+ df[!,col].^2 .* df.nsamples) / (nsamples-1)
-        end
-        
-        function err_on_mean(col, err_col)
-            s = meansq(col, err_col) - dmeans[col].^2
-            return sqrt(s / nsamples)
-        end
-        
-        derrs = Dict(err_col => err_on_mean(col, err_col) for (col, err_col) in zip(res_cols, err_cols))
-        
-        means_with_errs =  reduce(vcat, [[col => dmeans[col], err_col => derrs[err_col]] 
-                                    for (col, err_col) in zip(res_cols, err_cols)])
-
-        return (; nsamples, means_with_errs...)  
-    end
-
-    dfnew = combine(reduce_measurements, gd, threads=false)
-
-    return dfnew
-end
-
+combine_results(df, by = 1:3, cols = 5:2:ncol(df), col_n = :nsamples)
 
 df_N40 = subseteq(df; α=0.2, N = 40)
 df_N50 = subseteq(df; α=0.2, N = 50)
