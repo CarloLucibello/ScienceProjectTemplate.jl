@@ -9,9 +9,18 @@ using Measurements
 println("Starting tests")
 ti = time()
 
-@testset "Utils" begin
-    include("utils/misc.jl")
-    include("utils/stats.jl")
+@testset "Library" begin
+    @testset "Utils" begin
+        include("utils/misc.jl")
+        include("utils/stats.jl")
+    end
+end
+
+@testset "Scripts" begin
+    @testset "gradient_descent" begin
+        include("../scripts/gradient_descent.jl")
+        include("scripts/gradient_descent.jl")
+    end
 end
 
 ti = time() - ti
