@@ -2,7 +2,7 @@
 
 A template for boostrapping scientific projects containing Julia code.
 
-Clone the repo, then replace `ScienceProjectTemplate` everywhere with the name of you project.
+Clone the repo, then replace `ScienceProjectTemplate` everywhere with the name of your project.
 
 # Use as a package
 
