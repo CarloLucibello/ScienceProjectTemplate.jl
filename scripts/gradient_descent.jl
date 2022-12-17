@@ -14,9 +14,9 @@ BLAS.set_num_threads(1) # set to 1 when using multiple threads (julia -t X)
 function f_single_run(; N = 50,
                     α = 0.2,
                     η = 0.5,
+                    nsamples = 1,
                     λ = 0.1,
-                    maxsteps = 1000,
-                    nsamples = 1)
+                    maxsteps = 1000)
     
     if nsamples == 1
         # Dummy return for demonstration purpose
@@ -26,7 +26,7 @@ function f_single_run(; N = 50,
         stats = ThreadsX.mapreduce(Stats(), 1:nsamples) do _  # remove ThreadsX. for single thread
             return (t = rand(1:100), E = rand())            
         end
-        return (; nsamples, mean_with_err(stats)...)
+        return mean_with_err(stats)
     end
 end
 
@@ -35,11 +35,12 @@ function parallel_run(;
         N = 40,
         α = 0.2,
         λ = [0.1:0.1:1.0;],
-        resfile = savename((; N, α), "csv", digits=4),
+        nsamples = 1,
+        resfile = savename((; N, α, nsamples), "csv", digits=4),
         respath = datadir("raw", splitext(basename(@__FILE__))[1]), # defaults to data/raw/SCRIPTNAME 
         kws...)
 
-    params_list = cartesian_list(; N, α, λ)
+    params_list = cartesian_list(; N, α, λ, nsamples)
     allres = Vector{Any}(undef, length(params_list))
     
     ThreadsX.foreach(enumerate(params_list)) do (i, p) # remove ThreadsX. for single threaded run
@@ -55,7 +56,6 @@ function parallel_run(;
     end
     return allres
 end
-
 
 ## use @btime and @profview for profiling
 # @btime f_single_run()

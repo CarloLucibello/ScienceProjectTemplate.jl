@@ -5,7 +5,10 @@ using Plots, StatsPlots
 
 # function data_analysis()
 respath = datadir("raw", "gradient_descent")
-dfs = [CSV.read(joinpath(respath, file), DataFrame) for file in readdir(respath)]
+files = [joinpath(respath, file) for file in readdir(respath) 
+         if !(contains(file, "nsamples=1.") || contains(file, "nsamples=1_"))]
+
+dfs = [CSV.read(file) for file in files]
 df = reduce(vcat, dfs)
 
 function combine_results(df; par_idxs, res_idxs, err_idxs = res_idxs .+ 1)
@@ -43,10 +46,10 @@ function combine_results(df; par_idxs, res_idxs, err_idxs = res_idxs .+ 1)
 end
 
 
-df_N40 = filterdf(; 0.2, N = 40)
-df_N50 = filterdf(; α, N = 50)
-df_N60 = filterdf(; α, N = 60)
-df_N70 = filterdf(; α, N = 70)
+df_N40 = subseteq(df; α=0.2, N = 40)
+df_N50 = subseteq(df; α=0.2, N = 50)
+df_N60 = subseteq(df; α=0.2, N = 60)
+df_N70 = subseteq(df; α=0.2, N = 70)
 
 
 plot(title = "Final dist. from init. cond. of GD. α=$α",
@@ -54,4 +57,4 @@ plot(title = "Final dist. from init. cond. of GD. α=$α",
     ylabel = "Δ", 
     legend = :topright)
    
-@df df_N70 plot!(:λ, :Δ0, yerr = :Δ0_err, label = "N = 70", msc=:auto)
+@df df_N40 plot!(:λ, :Δ0, yerr = :Δ0_err, label = "N = 70", msc=:auto)
