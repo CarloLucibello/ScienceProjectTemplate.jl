@@ -1,9 +1,8 @@
-@testset "dict_list" begin
-    d = OrderedDict(:z => [1,2], :a => [3,4], :f => 2)
-    dlist = dict_list(d)
-    @test length(dlist) == 4
-    @test dlist[1] isa OrderedDict
-    for d in dlist
-        @test collect(keys(d)) == [:z, :a, :f]
+@testset "cartesian_list" begin
+    list = cartesian_list(z = [1,2], a = [3,4], f = 2)
+    @test length(list) == 4
+    @test list[1] isa NamedTuple
+    for l in list
+        @test collect(keys(l)) == [:z, :a, :f]
     end
 end

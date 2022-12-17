@@ -10,7 +10,7 @@ include("utils/stats.jl")
 export Stats, mean_with_err
 
 include("utils/misc.jl")
-export check_filename, dict_list
+export check_filename, cartesian_list
 
 
 end # module

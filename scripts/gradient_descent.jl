@@ -6,10 +6,7 @@ using ScienceProjectTemplate
 using LinearAlgebra, Random, Statistics
 using DataFrames, CSV
 using BenchmarkTools
-using OrderedCollections: OrderedDict
 using ThreadsX
-
-splitext(basename(@__FILE__))[1]
 
 BLAS.set_num_threads(1) # set to 1 when using multiple threads (julia -t X)
 # BLAS.set_num_threads(Sys.CPU_THREADS) # default value
@@ -41,18 +38,18 @@ function parallel_run(;
         respath = datadir("raw", splitext(basename(@__FILE__))[1]), # defaults to data/raw/SCRIPTNAME 
         kws...)
 
-    params_list = dict_list(OrderedDict(:N => N, :α=> α, :λ => λ))
+    params_list = cartesian_list(; N, α, λ)
     allres = Vector{Any}(undef, length(params_list))
     
     ThreadsX.foreach(enumerate(params_list)) do (i, p) # remove ThreadsX. for single threaded run
         res = f_single_run(; p..., kws...)
-        allres[i] = NamedTuple(merge(p, res))
+        allres[i] = merge(p, res)
     end
 
     allres = DataFrame(allres)
     if resfile != "" && resfile !== nothing
         path = joinpath(respath, resfile)
-        path = check_filename(path) # append a number if the file already exists
+        path = check_filename(path) # appends a number if the file already exists
         CSV.write(path, allres)
     end
     return allres

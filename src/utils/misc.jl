@@ -14,11 +14,9 @@ function check_filename(filename)
     return filename
 end
 
-# PIRACY! TODO: make PR to DrWatson.jl
-function DrWatson.dict_list(od::OrderedDict)
-    d = Dict(od)
-    dlist = dict_list(d)
-    return [OrderedDict((k => d[k] for k in keys(od))...) for d in dlist]
+function cartesian_list(; kws...)
+    dlist = dict_list(Dict(kws...))
+    return [(; (k => d[k] for (k,_) in kws)...) for d in dlist]
 end
 
 function Base.merge(s::OrderedDict, nt::NamedTuple)
