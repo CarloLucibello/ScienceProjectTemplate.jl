@@ -5,6 +5,7 @@ using Random, Statistics, LinearAlgebra
 import OnlineStats
 using OrderedCollections: OrderedDict
 using Measurements
+using DataFrames
 
 println("Starting tests")
 ti = time()
