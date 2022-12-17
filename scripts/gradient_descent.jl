@@ -19,8 +19,9 @@ function f_single_run(; N = 50,
                     nsamples = 1)
     
     if nsamples == 1
-        # dummy function for demonstration purpose
-        return (t = rand(1:100), E = rand())
+        # Dummy return for demonstration purpose
+        # Can be a NamedTuple, a Dict, or a OrderedDict 
+        return (t = rand(1:100), E = rand())  
     else 
         stats = ThreadsX.mapreduce(Stats(), 1:nsamples) do _  # remove ThreadsX. for single thread
             return (t = rand(1:100), E = rand())            
