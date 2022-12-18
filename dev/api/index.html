@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>API · ScienceProjectTemplate.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">ScienceProjectTemplate.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>API</a><ul class="internal"><li><a class="tocitem" href="#Index"><span>Index</span></a></li><li><a class="tocitem" href="#Docs"><span>Docs</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>API</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>API</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/main/docs/src/api.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="API"><a class="docs-heading-anchor" href="#API">API</a><a id="API-1"></a><a class="docs-heading-anchor-permalink" href="#API" title="Permalink"></a></h1><h2 id="Index"><a class="docs-heading-anchor" href="#Index">Index</a><a id="Index-1"></a><a class="docs-heading-anchor-permalink" href="#Index" title="Permalink"></a></h2><ul><li><a href="#ScienceProjectTemplate.Stats"><code>ScienceProjectTemplate.Stats</code></a></li><li><a href="#ScienceProjectTemplate.cartesian_list-Tuple{}"><code>ScienceProjectTemplate.cartesian_list</code></a></li><li><a href="#ScienceProjectTemplate.check_filename-Tuple{Any}"><code>ScienceProjectTemplate.check_filename</code></a></li><li><a href="#ScienceProjectTemplate.combine_results-Tuple{DataFrames.DataFrame}"><code>ScienceProjectTemplate.combine_results</code></a></li><li><a href="#ScienceProjectTemplate.subseteq-Tuple{Any}"><code>ScienceProjectTemplate.subseteq</code></a></li></ul><h2 id="Docs"><a class="docs-heading-anchor" href="#Docs">Docs</a><a id="Docs-1"></a><a class="docs-heading-anchor-permalink" href="#Docs" title="Permalink"></a></h2><h3 id="Stats"><a class="docs-heading-anchor" href="#Stats">Stats</a><a id="Stats-1"></a><a class="docs-heading-anchor-permalink" href="#Stats" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ScienceProjectTemplate.Stats" href="#ScienceProjectTemplate.Stats"><code>ScienceProjectTemplate.Stats</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">Stats() &lt;: OnlineStat</code></pre><p>A type for collecting statistics. </p><p><strong>Examples</strong></p><pre><code class="language-julia hljs">julia&gt; using OnlineStats
+
+julia&gt; s = Stats();
+
+julia&gt; OnlineStats.fit!(s, (a = 1, b = 2));  # add one datapoint at a time
+
+julia&gt; OnlineStats.fit!(s, Dict(:a =&gt; 2, :b =&gt; 3, :c=&gt;4)); # also support dicts and new observables
+
+julia&gt; s
+Stats:
+  a  =  1.5 ± 0.25      (2 obs)
+  b  =  2.5 ± 0.25      (2 obs)
+  c  =  4.0 ± 1.0       (1 obs)
+
+julia&gt; data = [(a = i, b = 2*i) for i in 1:10];
+
+julia&gt; OnlineStats.fit!(s, data);  # add multiple datapoints
+
+julia&gt; OnlineStats.nobs(s)
+12
+
+julia&gt; s.a      # mean and error (as a Measurements.jl type)
+1.5 ± 0.25
+
+# reduce interface
+
+julia&gt; reduce(Stats(), data)
+Stats:
+  a  =  5.5 ± 0.92        (10 obs)
+  b  =  11.0 ± 3.7        (10 obs)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/6bc6797ce2f3db8b5cd221a0aa84fa39ef8dbb4c/src/utils/stats.jl#L1-L40">source</a></section></article><h3 id="Misc"><a class="docs-heading-anchor" href="#Misc">Misc</a><a id="Misc-1"></a><a class="docs-heading-anchor-permalink" href="#Misc" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="ScienceProjectTemplate.cartesian_list-Tuple{}" href="#ScienceProjectTemplate.cartesian_list-Tuple{}"><code>ScienceProjectTemplate.cartesian_list</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">cartesian_list(; kws...)</code></pre><p>Return a vector containing all of the combinations of the values in the keyword arguments. Similar to <code>collect(Iterators.product(kws...))</code>  and to <a href="@ref"><code>DrWatson.dict_list</code></a> but returns a vector of <code>NamedTuple</code>s.</p><p><strong>Examples</strong></p><pre><code class="language-julia hljs">julia&gt; cartesian_list(a = [1,2], b = [3,4])
+2-element Vector{NamedTuple{(:a, :b),Tuple{Int64,Int64}}}:
+ (a = 1, b = 3)
+ (a = 1, b = 4)
+ (a = 2, b = 3)
+ (a = 2, b = 4)</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/6bc6797ce2f3db8b5cd221a0aa84fa39ef8dbb4c/src/utils/misc.jl#L19-L36">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="ScienceProjectTemplate.check_filename-Tuple{Any}" href="#ScienceProjectTemplate.check_filename-Tuple{Any}"><code>ScienceProjectTemplate.check_filename</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">check_filename(filename)</code></pre><p>Check if a file with the name <code>filename</code> exists, if so, append a number to the name.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/6bc6797ce2f3db8b5cd221a0aa84fa39ef8dbb4c/src/utils/misc.jl#L2-L6">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="ScienceProjectTemplate.combine_results-Tuple{DataFrames.DataFrame}" href="#ScienceProjectTemplate.combine_results-Tuple{DataFrames.DataFrame}"><code>ScienceProjectTemplate.combine_results</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">combine_results(df; by, cols, errs, col_n = :nsamples)</code></pre><p>Combine the results of measurements in <code>df</code> by averaging the values in <code>cols</code> grouped by the columns in <code>by</code> and  propagating the errors in <code>errs</code> using the number of samples in <code>col_n</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia hljs">julia&gt; using DataFrames
+
+julia&gt; df = DataFrame(a = [1,1,3], b=[2,2,4], n = [2,3,4], c = [2.,2.1,4.], c_err = [0.2,0.1,0.2])
+3×5 DataFrame
+ Row │ a      b      n      c        c_err   
+     │ Int64  Int64  Int64  Float64  Float64 
+─────┼───────────────────────────────────────
+   1 │     1      2      2      2.0      0.2
+   2 │     1      2      3      2.1      0.1
+   3 │     3      4      4      4.0      0.2
+
+julia&gt; combine_results(df, by=1:2, cols=4:2:ncol(df), errs=5:2:ncol(df), col_n=:n)
+2×5 DataFrame
+ Row │ a      b      n      c        c_err    
+     │ Int64  Int64  Int64  Float64  Float64  
+─────┼────────────────────────────────────────
+   1 │     1      2      5     2.06  0.087178
+   2 │     3      4      4     4.0   0.2</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/6bc6797ce2f3db8b5cd221a0aa84fa39ef8dbb4c/src/utils/misc.jl#L72-L101">source</a></section></article><article class="docstring"><header><a class="docstring-binding" id="ScienceProjectTemplate.subseteq-Tuple{Any}" href="#ScienceProjectTemplate.subseteq-Tuple{Any}"><code>ScienceProjectTemplate.subseteq</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia hljs">subseteq(df; col1=val1, col2=val2, ...)</code></pre><p>Return a subset of <code>df</code> where the values of the columns <code>col1</code>, <code>col2</code>, ...,  are equal to <code>val1</code>, <code>val2</code>, ... .</p><p><strong>Examples</strong></p><pre><code class="language-julia hljs">julia&gt; df = DataFrame(a=[1,1,3,1], b=[4,5,6,4], c=[7,8,9,10])
+4×3 DataFrame
+ Row │ a      b      c     
+     │ Int64  Int64  Int64 
+─────┼─────────────────────
+   1 │     1      4      7
+   2 │     1      5      8
+   3 │     3      6      9
+   4 │     1      4     10
+
+julia&gt; subseteq(df, a=1, b=4)
+2×3 DataFrame
+ Row │ a      b      c     
+     │ Int64  Int64  Int64 
+─────┼─────────────────────
+   1 │     1      4      7
+   2 │     1      4     10</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/CarloLucibello/ScienceProjectTemplate.jl/blob/6bc6797ce2f3db8b5cd221a0aa84fa39ef8dbb4c/src/utils/misc.jl#L42-L69">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.23 on <span class="colophon-date" title="Sunday 18 December 2022 13:18">Sunday 18 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
