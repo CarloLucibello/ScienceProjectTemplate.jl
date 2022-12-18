@@ -1,6 +1,8 @@
 
 """
-Check if a file with the name exists, if so, append a number to the name.
+    check_filename(filename)
+
+Check if a file with the name `filename` exists, if so, append a number to the name.
 """
 function check_filename(filename)
     mkpath(dirname(filename))
@@ -21,7 +23,7 @@ Return a vector containing all of the combinations of the values in the keyword 
 Similar to `collect(Iterators.product(kws...))` 
 and to [`DrWatson.dict_list`](@ref) but returns a vector of `NamedTuple`s.
 
-# Example
+# Examples
 
 ```julia
 julia> cartesian_list(a = [1,2], b = [3,4])
