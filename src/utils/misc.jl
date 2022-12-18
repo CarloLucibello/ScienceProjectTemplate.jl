@@ -116,13 +116,20 @@ function combine_results(df::DataFrame;
         dmeans = Dict(col => sum(df[!,col] .* nsamples) / totsamples for col in val_cols)
         
         function sumsq(col, err_col)
-            sumresidues = df[!,err_col].^2 .* nsamples .* (nsamples .- 1)
+            sumresidues = map(df[!,err_col], nsamples) do e, n 
+                n > 1 ? e^2 * n * (n - 1) : 0.0
+            end
+
             return sum(sumresidues .+ df[!,col].^2 .* nsamples)
         end
-        
+
         function err_on_mean(col, err_col)
             s = sumsq(col, err_col) - dmeans[col]^2 * totsamples
-            return sqrt(s / (totsamples * (totsamples - 1)))
+            if totsamples == 1
+                return Inf
+            else
+                return sqrt(s / (totsamples * (totsamples - 1)))
+            end
         end
         
         derrs = Dict(err_col => err_on_mean(col, err_col) for (col, err_col) in zip(val_cols, err_cols))
@@ -133,7 +140,7 @@ function combine_results(df::DataFrame;
         return (; [col_n => totsamples]..., means_with_errs...)  
     end
 
-    dfnew = combine(reduce_measurements, gd, threads=false)
+    dfnew = combine(reduce_measurements, gd)
     return dfnew
 end
 
