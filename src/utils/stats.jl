@@ -1,5 +1,5 @@
 """
-    Stats() <: OnlineStats.OnlineStat
+    Stats() <: OnlineStat
 
 A type for collecting statistics. 
 
@@ -36,6 +36,7 @@ julia> reduce(Stats(), data)
 Stats:
   a  =  5.5 ± 0.92        (10 obs)
   b  =  11.0 ± 3.7        (10 obs)
+```
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
     _stats::OrderedDict{Symbol, OnlineStat}

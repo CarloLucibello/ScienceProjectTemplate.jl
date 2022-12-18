@@ -1,4 +1,6 @@
-# This is an example script demonstrating a pattern for parallel runs.#
+# This is an example script demonstrating a pattern for parallel runs.
+# Launch julia with `julia -t X` to use X threads.
+
 
 using DrWatson
 using ScienceProjectTemplate
@@ -8,7 +10,7 @@ using DataFrames, CSV
 using BenchmarkTools
 using ThreadsX
 
-BLAS.set_num_threads(1) # set to 1 when using multiple threads (julia -t X)
+Threads.nthreads() > 1 && Blas.set_num_threads(1) 
 # BLAS.set_num_threads(Sys.CPU_THREADS) # default value
 
 function f_single_run(; N = 50,
@@ -20,7 +22,7 @@ function f_single_run(; N = 50,
     
     if nsamples == 1
         # Dummy return for demonstration purpose
-        # Can be a NamedTuple, a Dict, or a OrderedDict 
+        # Can be a NamedTuple, a Dict, or an OrderedDict 
         return (t = rand(1:100), E = rand())  
     else 
         stats = ThreadsX.mapreduce(Stats(), 1:nsamples) do _  # remove ThreadsX. for single thread
