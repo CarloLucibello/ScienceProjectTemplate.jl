@@ -16,9 +16,9 @@ julia> OnlineStats.fit!(s, Dict(:a => 2, :b => 3, :c=>4)); # also support dicts 
 
 julia> s
 Stats:
-  a  =  1.5 ± 0.25      (2 obs)
-  b  =  2.5 ± 0.25      (2 obs)
-  c  =  4.0 ± 1.0       (1 obs)
+  a  =  1.5 ± 0.5       (2 obs)
+  b  =  2.5 ± 0.5       (2 obs)
+  c  =  4.0 ± Inf       (1 obs)
 
 julia> data = [(a = i, b = 2*i) for i in 1:10];
 
@@ -28,15 +28,12 @@ julia> OnlineStats.nobs(s)
 12
 
 julia> s.a      # mean and error (as a Measurements.jl type)
-1.5 ± 0.25
-
-# reduce interface
+4.83 ± 0.91
 
 julia> reduce(Stats(), data)
 Stats:
-  a  =  5.5 ± 0.92        (10 obs)
-  b  =  11.0 ± 3.7        (10 obs)
-```
+  a  =  5.5 ± 0.96      (10 obs)
+  b  =  11.0 ± 1.9      (10 obs)
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
     _stats::OrderedDict{Symbol, OnlineStat}
