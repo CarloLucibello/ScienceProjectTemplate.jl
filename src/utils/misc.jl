@@ -46,14 +46,13 @@ are equal to `val1`, `val2`, ... .
 # Examples
 
 ```julia
-
-julia> df = DataFrame(a=[1,2,3,1], b=[4,5,6,4], c=[7,8,9,10])
+julia> df = DataFrame(a=[1,1,3,1], b=[4,5,6,4], c=[7,8,9,10])
 4×3 DataFrame
  Row │ a      b      c     
      │ Int64  Int64  Int64 
 ─────┼─────────────────────
    1 │     1      4      7
-   2 │     2      5      8
+   2 │     1      5      8
    3 │     3      6      9
    4 │     1      4     10
 
