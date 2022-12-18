@@ -1,5 +1,9 @@
 # ScienceProjectTemplate
 
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://CarloLucibello.github.io/ScienceProjectTemplate.jl/dev)
+![](https://github.com/CarloLucibello/ScienceProjectTemplate.jl/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/CarloLucibello/ScienceProjectTemplate.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/CarloLucibello/ScienceProjectTemplate.jl)
+
 A template for boostrapping scientific projects containing Julia code.
 
 Clone the repo, then replace `ScienceProjectTemplate` everywhere with the name of your project.
