@@ -10,7 +10,7 @@ using DataFrames, CSV
 using BenchmarkTools
 using ThreadsX
 
-Threads.nthreads() > 1 && Blas.set_num_threads(1) 
+Threads.nthreads() > 1 && BLAS.set_num_threads(1) 
 # BLAS.set_num_threads(Sys.CPU_THREADS) # default value
 
 function f_single_run(; N = 50,
