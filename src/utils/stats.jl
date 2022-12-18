@@ -34,6 +34,7 @@ julia> reduce(Stats(), data)
 Stats:
   a  =  5.5 ± 0.96      (10 obs)
   b  =  11.0 ± 1.9      (10 obs)
+```
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
     _stats::OrderedDict{Symbol, OnlineStat}
