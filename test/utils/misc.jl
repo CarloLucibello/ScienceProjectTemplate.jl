@@ -33,4 +33,10 @@ end
         df2 = combine_results(df, by=2, cols=4:2:ncol(df), errs=5:2:ncol(df), col_n=:n)
         @test df2 ≈ DataFrame(b=[2,4], n=[2,1], c=[2.5,4.], c_delta=[0.5,Inf])
     end
+
+    @testset "no error" begin
+        df = DataFrame(a=[1,1,3,1], b=[1,2,6,3], c=[7,8,9,10])
+        df2 = combine_results(df, by=:a, cols=:b)
+        @test df2 ≈ DataFrame(a=[1,3], nsamples=[3,1], b=[2.,6.], b_err=[0.5773502691896,Inf])
+    end
 end
