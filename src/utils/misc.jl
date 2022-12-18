@@ -102,20 +102,28 @@ julia> combine_results(df, by=1:2, cols=4:2:ncol(df), errs=5:2:ncol(df), col_n=:
 function combine_results(df::DataFrame; 
         by, 
         cols, 
-        errs, 
+        errs = nothing, 
         col_n::Symbol = :nsamples)
 
-    par_cols = Symbol.(names(df)[by])
-    val_cols = Symbol.(names(df)[cols])
-    err_cols = Symbol.(names(df)[errs])
+    par_cols = normalize_colnames(df, by)
+    val_cols = normalize_colnames(df, cols)
 
-    gd = groupby(df, par_cols)
+    if errs !== nothing
+        @assert length(cols) == length(errs)
+        err_cols = normalize_colnames(df, errs)
+    else
+        err_cols = [Symbol(k, "_err") for k in val_cols]
+    end
 
     function reduce_measurements(df)
-        nsamples = df[!, col_n]
+        if errs === nothing
+            nsamples = ones(Int, nrow(df))
+        else
+            nsamples = df[!, col_n]
+        end
         totsamples = sum(nsamples)
         dmeans = Dict(col => sum(df[!,col] .* nsamples) / totsamples for col in val_cols)
-        
+
         function sumsq(col, err_col)
             sumresidues = map(df[!,err_col], nsamples) do e, n 
                 n > 1 ? e^2 * n * (n - 1) : 0.0
@@ -125,7 +133,11 @@ function combine_results(df::DataFrame;
         end
 
         function err_on_mean(col, err_col)
-            s = sumsq(col, err_col) - dmeans[col]^2 * totsamples
+            if errs === nothing
+                s = var(df[!,col]) * (totsamples - 1)
+            else
+                s = sumsq(col, err_col) - dmeans[col]^2 * totsamples
+            end
             if totsamples == 1
                 return Inf
             else
@@ -136,16 +148,23 @@ function combine_results(df::DataFrame;
         derrs = Dict(err_col => err_on_mean(col, err_col) for (col, err_col) in zip(val_cols, err_cols))
         
         means_with_errs =  reduce(vcat, [[col => dmeans[col], err_col => derrs[err_col]] 
-                                    for (col, err_col) in zip(val_cols, err_cols)])
+                                          for (col, err_col) in zip(val_cols, err_cols)])
 
         return (; [col_n => totsamples]..., means_with_errs...)  
     end
 
+    gd = groupby(df, par_cols)
     dfnew = combine(reduce_measurements, gd)
     return dfnew
 end
 
-# PIRACY!
+normalize_colnames(df, k::Integer) = Symbol.([names(df)[k]])
+normalize_colnames(df, k::AbstractVector{<:Integer}) = Symbol.(names(df)[k])
+normalize_colnames(df, k::Symbol) = [k]
+normalize_colnames(df, k::AbstractVector{<:Symbol}) = k
+normalize_colnames(df, k::AbstractString) = [Symbol(k)]
+normalize_colnames(df, k::AbstractVector{<:AbstractString}) = Symbol.(k)
+
 function Base.merge(s::OrderedDict, nt::NamedTuple)
     snew = deepcopy(s)
     for (k, v) in pairs(nt)
