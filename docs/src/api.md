@@ -4,7 +4,7 @@
 
 ```@index
 Order = [:type, :function]
-Pages   = ["misc.md"]
+Pages   = ["api.md"]
 ```
 
 ## Docs

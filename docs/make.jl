@@ -12,9 +12,10 @@ makedocs(;
     modules = [ScienceProjectTemplate],
     doctest = true, 
     clean = true,    
-    format= Documenter.HTML(; mathengine, prettyurls, assets=assets),
+    format= Documenter.HTML(; mathengine, prettyurls),
     sitename = "ScienceProjectTemplate.jl",
     pages = ["Home" => "index.md",
+             "API"  => "api.md",
             ],
 )
 
