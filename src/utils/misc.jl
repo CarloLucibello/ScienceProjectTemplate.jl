@@ -35,9 +35,13 @@ julia> cartesian_list(a = [1,2], b = [3,4])
 ```
 """
 function cartesian_list(; kws...)
-    dlist = dict_list(Dict(kws...))
+    dlist = dict_list(_cartesian_kws_to_dict(kws))
     return [(; (k => d[k] for (k,_) in kws)...) for d in dlist]
 end
+
+_cartesian_kws_to_dict(kws) = Dict(k => _collect_if_vec(v) for (k,v) in pairs(kws))
+_collect_if_vec(x::AbstractVector) = collect(x)
+_collect_if_vec(x) = x
 
 """
     subseteq(df; col1=val1, col2=val2, ...)

@@ -5,6 +5,8 @@
     for l in list
         @test collect(keys(l)) == [:z, :a, :f]
     end
+
+    @test cartesian_list(a = 3:4, f = 2) == [(a = 3, f = 2), (a = 4, f = 2)]
 end
 
 @testset "subseteq" begin
