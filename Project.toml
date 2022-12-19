@@ -1,5 +1,5 @@
 name = "ScienceProjectTemplate"
-uuid = "947d2956-6795-461a-b577-048b8c768794"
+uuid = "947d2956-6795-461a-b577-048b8c768794"  # generate a new one with `using UUIDs; uuid4()`
 author = "Carlo Lucibello"
 version = "0.0.1"
 
@@ -19,9 +19,10 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 ThreadsX = "ac1d9e8a-700a-412c-b207-f0111f4b6c0d"
 
 [compat]
-BenchamrkTools = "1"
+BenchmarkTools = "1"
 CSV = "0.10"
-DrWatson = "2.12.0"
+DataFrames = "1"
+DrWatson = "2"
 Measurements = "2"
 OnlineStats = "1"
 OrderedCollections = "1"
