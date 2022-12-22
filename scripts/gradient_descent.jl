@@ -38,7 +38,7 @@ function parallel_run(;
         α = 0.2,
         λ = [0.1:0.1:1.0;],
         nsamples = 1,
-        resfile = savename((; N, α, nsamples), "csv", digits=4),
+        resfile = savename("run_"*gethostname(), (; N, α, nsamples), "csv", digits=4),
         respath = datadir("raw", splitext(basename(@__FILE__))[1]), # defaults to data/raw/SCRIPTNAME 
         kws...)
 
