@@ -43,20 +43,53 @@ function parallel_run(;
         kws...)
 
     params_list = cartesian_list(; N, α, λ, nsamples)
-    allres = Vector{Any}(undef, length(params_list))
     
-    ThreadsX.foreach(enumerate(params_list)) do (i, p) # remove ThreadsX. for single threaded run
+    allres = ThreadsX.map(params_list) do p     # remove ThreadsX. for single threaded run
         res = f_single_run(; p..., kws...)
-        allres[i] = merge(p, res)
+        return merge(p, res)
     end
 
-    allres = DataFrame(allres)
+    df = DataFrame(allres)
     if resfile != "" && resfile !== nothing
         path = joinpath(respath, resfile)
         path = check_filename(path) # appends a number if the file already exists
-        CSV.write(path, allres)
+        CSV.write(path, df)
     end
-    return allres
+    return df
+end
+
+
+# same as parallel_run but prints while looping
+function parallel_run_v2(;
+        N = 40,
+        α = 0.2,
+        λ = [0.1:0.1:1.0;],
+        nsamples = 1,
+        resfile = savename("run_"*gethostname(), (; N, α, nsamples), "csv", digits=4),
+        respath = datadir("raw", splitext(basename(@__FILE__))[1]), # defaults to data/raw/SCRIPTNAME 
+        kws...)
+
+    if resfile != "" && resfile !== nothing
+        resfile = joinpath(respath, resfile)
+        resfile = check_filename(resfile) # appends a number if the file already exists
+        touch(resfile)
+    end
+    
+    params_list = cartesian_list(; N, α, λ, nsamples)
+    
+    lck = ReentrantLock()
+    df = DataFrame()
+    ThreadsX.foreach(params_list) do p     # remove ThreadsX. for single threaded run
+        res = f_single_run(; p..., kws...)
+        lock(lck) do 
+            push!(df, merge(p, res))
+            if resfile != "" && resfile !== nothing
+                CSV.write(resfile, df)
+            end
+        end
+    end
+
+    return df
 end
 
 ## use @btime and @profview for profiling
