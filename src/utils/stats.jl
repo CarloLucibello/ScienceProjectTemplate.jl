@@ -135,3 +135,13 @@ function (s::Stats)(x::Stats, y)
     return s
 end
 
+function Base.reduce(s::Stats, data::NamedTuple)
+    s = deepcopy(s)
+    for (k, v) in pairs(data)
+        if !haskey(s, k)
+            s[k] = _init_stat()
+        end
+        OnlineStats.fit!(s[k], v)
+    end
+    return s
+end

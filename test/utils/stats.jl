@@ -28,6 +28,7 @@
         @test s.a.err == Inf
     end
 
+
     @testset "reduce" begin
         data = [(a = i, b = 2*i) for i in 1:10];
         s = reduce(Stats(), data)
@@ -48,5 +49,25 @@
         @test m.a.err ≈ 0.957427107756338
         @test m.b.val ≈ 11.0
         @test m.b.err ≈ 1.9148542155126762
+    end
+
+    @testset "fit named tuple of vectors" begin
+        s = OnlineStats.fit!(Stats(), (a = [1, 2, 3], b = [2, 4]))
+        @test OnlineStats.nobs(s[:a]) == 3
+        @test s.a ≈ 2
+        @test OnlineStats.nobs(s[:b]) == 2
+        @test s.b ≈ 3
+    end
+    
+    @testset "reduce named tuple of vectors" begin
+        s = reduce(Stats(), (a = [1, 2, 3], b = [2, 4]))
+        @test OnlineStats.nobs(s[:a]) == 3
+        @test s.a ≈ 2
+        @test OnlineStats.nobs(s[:b]) == 2
+        @test s.b ≈ 3
+
+        s = reduce(s, (a = [1, 2, 3], b = [2, 4]))
+        @test OnlineStats.nobs(s[:a]) == 6
+        @test OnlineStats.nobs(s[:b]) == 4
     end
 end
