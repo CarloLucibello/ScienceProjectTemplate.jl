@@ -9,12 +9,6 @@
     @test cartesian_list(a = 3:4, f = 2) == [(a = 3, f = 2), (a = 4, f = 2)]
 end
 
-@testset "subseteq" begin
-    df = DataFrame(a=[1,2,3,1], b=[4,5,6,4], c=[7,8,9,10])
-    df2 = subseteq(df, a=1, b=4)
-    @test df2 == DataFrame(a=[1,1], b=[4,4], c=[7,10])
-end
-
 @testset "combine_results" begin
     df = DataFrame(a = [1,1,3], 
                    b = [2,2,4], 

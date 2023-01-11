@@ -1,6 +1,6 @@
 using ScienceProjectTemplate
 using DrWatson
-using DataFrames, CSV
+using DataFrames, DataFramesMeta, CSV
 using Plots, StatsPlots
 
 # function data_analysis()
@@ -16,10 +16,11 @@ df = combine_results(df, by = 1:3,
             errs = 6:2:ncol(df), 
             col_n = :nsamples)
 
-df_N40 = subseteq(df; α=0.2, N=40)
-df_N50 = subseteq(df; α=0.2, N=50)
-df_N60 = subseteq(df; α=0.2, N=60)
-df_N70 = subseteq(df; α=0.2, N=70)
+# Use DataFramesMeta for row selection
+df_N40 = @rsubset(df, :α == 0.2, :N == 40)
+df_N50 = @rsubset(df, :α == 0.2, :N == 50)
+df_N60 = @rsubset(df, :α == 0.2, :N == 60)
+df_N70 = @rsubset(df, :α == 0.2, :N == 70)
 
 plot(title = "Final loss GD vs L2 regularize parameter λ",
     xlabel = "λ",  ylabel = "E", legend = :topright)

@@ -44,36 +44,6 @@ _collect_if_vec(x::AbstractVector) = collect(x)
 _collect_if_vec(x) = x
 
 """
-    subseteq(df; col1=val1, col2=val2, ...)
-
-Return a subset of `df` where the values of the columns `col1`, `col2`, ..., 
-are equal to `val1`, `val2`, ... .
-
-# Examples
-
-```julia
-julia> df = DataFrame(a=[1,1,3,1], b=[4,5,6,4], c=[7,8,9,10])
-4×3 DataFrame
- Row │ a      b      c     
-     │ Int64  Int64  Int64 
-─────┼─────────────────────
-   1 │     1      4      7
-   2 │     1      5      8
-   3 │     3      6      9
-   4 │     1      4     10
-
-julia> subseteq(df, a=1, b=4)
-2×3 DataFrame
- Row │ a      b      c     
-     │ Int64  Int64  Int64 
-─────┼─────────────────────
-   1 │     1      4      7
-   2 │     1      4     10
-```
-"""
-subseteq(df; kws...) = DataFrames.subset(df, (k => x -> x .== v for (k, v) in kws)...)
-
-"""
     combine_results(df; by, cols, errs = nothing, col_n = :nsamples)
 
 Combine the results of measurements in `df` by averaging the values in `cols`
