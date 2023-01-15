@@ -182,5 +182,5 @@ If `x` is a container of numers, round its content.
 """
 round3(x) = round(x, sigdigits=3)
 round3(x::NamedTuple) = map(round3, x)
-round3(x::AbstractInteger) = x
+round3(x::Integer) = x
 round3(x::AbstractArray) = round.(x, sigdigits=3)
