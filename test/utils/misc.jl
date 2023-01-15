@@ -36,3 +36,9 @@ end
         @test df2 ≈ DataFrame(a=[1,3], nsamples=[3,1], b=[2.,6.], b_err=[0.5773502691896,Inf])
     end
 end
+
+@testset "round3" begin
+    @test round3(1.234) == 1.23
+    @test round3(3) isa Int
+    @test round3((a=2.1111, b=3.33333)) == (a=2.11, b=3.33)
+end

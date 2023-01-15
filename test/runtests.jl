@@ -19,7 +19,7 @@ end
 
 @testset "Scripts" begin
     @testset "gradient_descent" begin
-        include("../scripts/gradient_descent.jl")
+        include("../scripts/gradient_descent_threads.jl")
         include("scripts/gradient_descent.jl")
     end
 end
