@@ -140,7 +140,7 @@ function combine_results(df::DataFrame;
             if totsamples == 1
                 return Inf
             else
-                return sqrt(s / (totsamples * (totsamples - 1)))
+                return sqrt(s / (totsamples * (totsamples - 1)) + 1e-16)
             end
         end
         
@@ -171,3 +171,11 @@ function Base.merge(s::OrderedDict, nt::NamedTuple)
     end
     return snew
 end
+
+
+## I/O
+
+round3(x) = round(x, sigdigits=3)
+round3(x::NamedTuple) = map(round3, x)
+round3(x::AbstractInteger) = x
+round3(x::AbstractArray) = round.(x, sigdigits=3)
