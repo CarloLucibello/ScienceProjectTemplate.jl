@@ -5,7 +5,7 @@ using Plots, StatsPlots
 using Glob
 
 respath = datadir("raw", "gradient_descent")
-files = [file for file in glob("*.csv", respath) if !contains(file, "nsamples=1_")]
+files = [file for file in glob("*.csv*", respath) if !contains(file, "nsamples=1_")]
 
 dfs = [CSV.read(file, DataFrame) for file in files]
 df = reduce(vcat, dfs)
