@@ -11,7 +11,7 @@ include("utils/stats.jl")
 export Stats, mean_with_err
 
 include("utils/misc.jl")
-export check_filename, cartesian_list, combine_results
+export check_filename, cartesian_list, combine_results, round3
 
 
 end # module

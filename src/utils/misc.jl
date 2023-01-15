@@ -174,7 +174,12 @@ end
 
 
 ## I/O
+"""
+    round3(x)
 
+If `x` is a floating point number, round `x` to 3 significant digits. 
+If `x` is a container of numers, round its content.
+"""
 round3(x) = round(x, sigdigits=3)
 round3(x::NamedTuple) = map(round3, x)
 round3(x::AbstractInteger) = x
