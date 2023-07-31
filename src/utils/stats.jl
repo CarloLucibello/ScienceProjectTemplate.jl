@@ -14,9 +14,11 @@ julia> OnlineStats.fit!(s, (a = 1, b = 2));  # add one datapoint at a time
 
 julia> OnlineStats.fit!(s, Dict(:a => 2, :b => 3, :c=>4)); # also support dicts and new observables
 
+julia> OnlineStats.fit!(s, (a = 4, b = missing)); # ignores missings
+
 julia> s
 Stats:
-  a  =  1.5 ± 0.5       (2 obs)
+  a  =  2.33 ± 0.88     (3 obs)
   b  =  2.5 ± 0.5       (2 obs)
   c  =  4.0 ± Inf       (1 obs)
 
@@ -25,12 +27,12 @@ julia> data = [(a = i, b = 2*i) for i in 1:10];
 julia> OnlineStats.fit!(s, data);  # add multiple datapoints
 
 julia> OnlineStats.nobs(s)
-12
+13
 
 julia> s.a      # mean and error (as a Measurements.jl type)
-4.83 ± 0.91
+4.77 ± 0.84
 
-julia> reduce(Stats(), data)
+julia> reduce(Stats(), data) # compatibility with reduce
 Stats:
   a  =  5.5 ± 0.96      (10 obs)
   b  =  11.0 ± 1.9      (10 obs)
@@ -61,7 +63,7 @@ function Base.getproperty(s::Stats, k::Symbol)
         x = getfield(s, :_stats)[k].stats
         n = OnlineStats.nobs(x[1])
         μ = OnlineStats.value(x[1])
-        σ = n == 1 ? Inf : sqrt(OnlineStats.value(x[2]) / n)
+        σ = n == 1 ? Inf : sqrt(OnlineStats.value(x[2]) / n) # sqrt( \sum_i (x_i - x̄)^2 / (n * (n-1)))
         return μ ± σ
     end
 end
@@ -71,7 +73,7 @@ function OnlineStats._fit!(s::Stats, x::Union{NamedTuple, AbstractDict{Symbol}})
         if !haskey(s, k)
             s[k] = _init_stat()
         end
-        OnlineStats.fit!(s[k], v)
+        _stat_fit!(s[k], v)
     end
 end
 
@@ -123,15 +125,15 @@ end
 # Binary op interface for reduce/mapreduce
 function (s::Stats)(x, y)
     @assert OnlineStats.nobs(s) == 0
-    OnlineStats.fit!(s, x)
-    OnlineStats.fit!(s, y)
+    _stat_fit!(s, x)
+    _stat_fit!(s, y)
     return s
 end
 
 # Binary op interface for reduce/mapreduce
 function (s::Stats)(x::Stats, y)
     @assert s === x
-    OnlineStats.fit!(s, y)
+    _stat_fit!(s, y)
     return s
 end
 
@@ -141,7 +143,10 @@ function Base.reduce(s::Stats, data::NamedTuple)
         if !haskey(s, k)
             s[k] = _init_stat()
         end
-        OnlineStats.fit!(s[k], v)
+        _stat_fit!(s[k], v)
     end
     return s
 end
+
+_stat_fit!(s, x::Missing) = s
+_stat_fit!(s, x) = OnlineStats.fit!(s, x)
