@@ -36,6 +36,14 @@ julia> reduce(Stats(), data) # compatibility with reduce
 Stats:
   a  =  5.5 ± 0.96      (10 obs)
   b  =  11.0 ± 1.9      (10 obs)
+
+
+julia> df = DataFrame(a=[1,2, 3], b=[3,4, missing]);
+
+julia> reduce(Stats(), df)  # reduce a table at once
+Stats:
+  a  =  2.0 ± 0.58      (3 obs)
+  b  =  3.5 ± 0.5       (2 obs)
 ```
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
