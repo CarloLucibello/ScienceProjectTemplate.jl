@@ -82,4 +82,16 @@
         @test OnlineStats.nobs(s[:c]) == 1
         @test s.c ≈ 3
     end
+
+    @testset "reduce tables" begin
+        df = DataFrame(a = [missing, 1, 2], b=[1,missing,2], c=[1,2,3])
+        s = reduce(Stats(), df)
+        
+        @test OnlineStats.nobs(s[:a]) == 2
+        @test s.a ≈ 1.5
+        @test OnlineStats.nobs(s[:b]) == 2
+        @test s.b ≈ 1.5
+        @test OnlineStats.nobs(s[:c]) == 3
+        @test s.c ≈ 2
+    end
 end

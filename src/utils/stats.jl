@@ -77,6 +77,7 @@ function OnlineStats._fit!(s::Stats, x::Union{NamedTuple, AbstractDict{Symbol}})
     end
 end
 
+
 _init_stat() = OnlineStats.Series(OnlineStats.Mean(), OnlineStats.Variance())
 
 Base.empty!(s::Stats) = s._stats = OrderedDict{Symbol, Any}()
@@ -148,5 +149,15 @@ function Base.reduce(s::Stats, data::NamedTuple)
     return s
 end
 
-_stat_fit!(s, x::Missing) = s
+function Base.reduce(s::Stats, tab)
+    @assert Tables.istable(tab)
+    for r in eachrow(tab)
+        OnlineStats.fit!(s::Stats, (; r...))
+    end
+    return s
+end
+
+Base.reduce(s::Stats, x::AbstractVector) = OnlineStats.fit!(s::Stats, x)
+
+_stat_fit!(s, ::Missing) = s
 _stat_fit!(s, x) = OnlineStats.fit!(s, x)
