@@ -6,6 +6,7 @@ using DrWatson: DrWatson, dict_list
 using OrderedCollections: OrderedDict
 using Measurements
 using DataFrames
+using Tables
 
 include("utils/stats.jl")
 export Stats, mean_with_err
