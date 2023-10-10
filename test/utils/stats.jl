@@ -1,5 +1,5 @@
 
-@testset "Stats.jl" begin
+@testset "Stats" begin
     s = Stats()
     OnlineStats.fit!(s, (a = 1, b = 2))
     OnlineStats.fit!(s, (a = 2, b = 3))
@@ -26,8 +26,14 @@
         s = OnlineStats.fit!(Stats(), [(a=1,),])
         @test s.a.val == 1 
         @test s.a.err == Inf
-    end
 
+        @testset "push! with one observation" begin
+            s = Stats()
+            push!(s, (a=1,))
+            @test s.a.val == 1 
+            @test s.a.err == Inf
+        end
+    end
 
     @testset "reduce" begin
         data = [(a = i, b = 2*i) for i in 1:10];

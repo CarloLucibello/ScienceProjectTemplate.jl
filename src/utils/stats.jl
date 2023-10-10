@@ -12,6 +12,8 @@ julia> s = Stats();
 
 julia> OnlineStats.fit!(s, (a = 1, b = 2));  # add one datapoint at a time
 
+# push!(s, (a = 1, b = 2))  # can be used as alternative to fit!
+
 julia> OnlineStats.fit!(s, Dict(:a => 2, :b => 3, :c=>4)); # also support dicts and new observables
 
 julia> OnlineStats.fit!(s, (a = 4, b = missing)); # ignores missings
@@ -54,7 +56,7 @@ Base.setindex!(s::Stats, v, k::Symbol) = setindex!(s._stats, v, k)
 Base.haskey(s::Stats, k::Symbol) = haskey(s._stats, k)
 Base.length(s::Stats) = length(s._stats)
 Base.values(s::Stats) = values(s._stats)
-
+Base.push!(s::Stats, x) = OnlineStats.fit!(s, x)
 
 function Base.getproperty(s::Stats, k::Symbol)
     if hasfield(Stats, k)

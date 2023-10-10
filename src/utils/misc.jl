@@ -157,6 +157,25 @@ function combine_results(df::DataFrame;
     return dfnew
 end
 
+## Simpler version 
+## TODO add error columns
+function combine_results_v2(df::DataFrame; by, cols)
+
+    par_cols = normalize_colnames(df, by)
+    val_cols = normalize_colnames(df, cols)
+
+    function reduce_measurements(df)
+        df = df[:, val_cols]
+        stat = reduce(Stats(), df)
+        nsamples = size(df, 1)
+        return (; nsamples, mean_with_err(stat)...)  
+    end
+
+    gd = groupby(df, par_cols)
+    dfnew = combine(reduce_measurements, gd)
+    return dfnew
+end
+
 normalize_colnames(df, k::Integer) = Symbol.([names(df)[k]])
 normalize_colnames(df, k::AbstractVector{<:Integer}) = Symbol.(names(df)[k])
 normalize_colnames(df, k::Symbol) = [k]
