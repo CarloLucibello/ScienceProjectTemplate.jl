@@ -36,14 +36,6 @@ julia> reduce(Stats(), data) # compatibility with reduce
 Stats:
   a  =  5.5 ± 0.96      (10 obs)
   b  =  11.0 ± 1.9      (10 obs)
-
-
-julia> df = DataFrame(a=[1,2, 3], b=[3,4, missing]);
-
-julia> reduce(Stats(), df)  # reduce a table at once
-Stats:
-  a  =  2.0 ± 0.58      (3 obs)
-  b  =  3.5 ± 0.5       (2 obs)
 ```
 """
 struct Stats <: OnlineStat{Union{NamedTuple, AbstractDict{Symbol}}}
@@ -157,15 +149,70 @@ function Base.reduce(s::Stats, data::NamedTuple)
     return s
 end
 
-function Base.reduce(s::Stats, tab)
-    @assert Tables.istable(tab)
-    for r in eachrow(tab)
+function Base.reduce(s::Stats, df::DataFrame)
+    for r in eachrow(df)
         OnlineStats.fit!(s::Stats, (; r...))
     end
     return s
 end
 
-Base.reduce(s::Stats, x::AbstractVector) = OnlineStats.fit!(s::Stats, x)
-
 _stat_fit!(s, ::Missing) = s
 _stat_fit!(s, x) = OnlineStats.fit!(s, x)
+
+"""
+    combine_results(df; by, cols, errs = nothing, col_n = :nsamples)
+
+Combine the results of measurements in `df` by averaging the values in `cols`
+grouped by the columns in `by`.
+
+For each column, it also computes an error given by `sqrt(var / (n*(n-1)))`, where `var` is the variance
+of the column and `n` is the total number of samples.
+
+# Examples
+
+```julia
+julia> using DataFrames
+
+julia> df = DataFrame(a=[1,1,3,1], b=[1,2,6,3], c=[7,8,9,10])
+4×3 DataFrame
+Row │ a      b      c     
+    │ Int64  Int64  Int64 
+─────┼─────────────────────
+    1 │     1      1      7
+    2 │     1      2      8
+    3 │     3      6      9
+    4 │     1      3     10
+
+
+julia> combine_results(df, by=:a, cols=:b)
+2×4 DataFrame
+Row │ a      nsamples  b        b_err     
+    │ Int64  Int64     Float64  Float64   
+─────┼─────────────────────────────────────
+    1 │     1         3      2.0    0.57735
+    2 │     3         1      6.0  Inf
+```
+"""
+function combine_results(df::DataFrame; by, cols)
+
+    par_cols = normalize_colnames(df, by)
+    val_cols = normalize_colnames(df, cols)
+
+    function reduce_measurements(df)
+        df = df[:, val_cols]
+        stat = reduce(Stats(), df)
+        nsamples = size(df, 1)
+        return (; nsamples, mean_with_err(stat)...)  
+    end
+
+    gd = groupby(df, par_cols)
+    dfnew = combine(reduce_measurements, gd)
+    return dfnew
+end
+
+normalize_colnames(df, k::Integer) = Symbol.([names(df)[k]])
+normalize_colnames(df, k::AbstractVector{<:Integer}) = Symbol.(names(df)[k])
+normalize_colnames(df, k::Symbol) = [k]
+normalize_colnames(df, k::AbstractVector{<:Symbol}) = k
+normalize_colnames(df, k::AbstractString) = [Symbol(k)]
+normalize_colnames(df, k::AbstractVector{<:AbstractString}) = Symbol.(k)
